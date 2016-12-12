@@ -1,0 +1,29 @@
+smtp:
+  #SMTP Server Name e.g. smtp.xyz.com
+  server:
+  #SMTP Port No. e.g 587
+  port: 
+  #Email address on SMTP server e.g. johndoe@xyz.com
+  email_address: 
+  #Duhh
+  password:
+
+message:
+  #The cell phone number of the alertee, Format expected is
+  #1. AT&T: number@txt.att.net
+  #2. T-Mobile: number@tmomail.net
+  #3. Verizon: number@vtext.com
+  #4. Sprint: number@messaging.sprintpcs.com or number@pm.sprint.com
+  #5. Republic Wireless: number@text.republicwireless.com
+  alertee:
+  #The message that should be sent to the alertee, be creative
+  text: Grab Yo Umbrella Fool!
+  #Details if required e.g CHANCE/TEMP
+  deets: CHANCE
+
+api:
+  provider:
+  user_id:
+  password:
+  #Unit of measurement e.g METRIC/IMPERIAL
+  unit:
