@@ -1,10 +1,18 @@
+weather:
+  provider: openweathermap
+  city_id:
+  app_id:
+  days:
+  units:
+  language: en
+
 smtp:
   #SMTP Server Name e.g. smtp.xyz.com
   server:
   #SMTP Port No. e.g 587
-  port: 
+  port:
   #Email address on SMTP server e.g. johndoe@xyz.com
-  email_address: 
+  email_address:
   #Duhh
   password:
 
@@ -18,12 +26,3 @@ message:
   alertee:
   #The message that should be sent to the alertee, be creative
   text: Grab Yo Umbrella Fool!
-  #Details if required e.g CHANCE/TEMP
-  deets: CHANCE
-
-api:
-  provider:
-  user_id:
-  password:
-  #Unit of measurement e.g METRIC/IMPERIAL
-  unit:
