@@ -49,7 +49,7 @@ def check_weather(configuration):
     forecast = content['list'][0]
     condition = forecast['weather'][0]
     if condition['main'] == "Rain":
-        return result, condition['description']
+        return condition['main'], condition['description']
 
     return "No Rain", ""
 
