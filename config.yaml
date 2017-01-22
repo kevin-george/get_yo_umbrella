@@ -24,5 +24,7 @@ message:
   #4. Sprint: number@messaging.sprintpcs.com or number@pm.sprint.com
   #5. Republic Wireless: number@text.republicwireless.com
   alertee:
-  #The message that should be sent to the alertee, be creative
-  text: Grab Yo Umbrella Fool!
+  #The messages that should be sent to the alertee, be creative
+  rain_text: Grab Yo Umbrella Fool!
+  no_rain_text: It's all cool yo
+  failure_text: Weather API failure

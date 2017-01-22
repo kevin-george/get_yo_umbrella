@@ -1,4 +1,3 @@
-import sys
 import smtplib
 import yaml
 import requests
@@ -6,9 +5,10 @@ import json
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from time import time, ctime
+import click
 
 
-def send_email(configuration, subject, body):
+def send_text(config, subject, body):
     message = MIMEMultipart()
     message['Subject'] = subject
     message.attach(MIMEText(body))
@@ -20,56 +20,54 @@ def send_email(configuration, subject, body):
     server.starttls()
     # Identify client again on the encrypted TLS session
     server.ehlo()
-    server.login(str(configuration['smtp']['email_address']).split('@')[0],
-                 configuration['smtp']['password'])
-    server.sendmail(configuration['smtp']['email_address'],
-                    configuration['message']['alertee'], message.as_string())
+    server.login(str(config['smtp']['email_address']).split('@')[0],
+                 config['smtp']['password'])
+    server.sendmail(config['smtp']['email_address'],
+                    config['message']['alertee'], message.as_string())
 
     server.quit()
 
 
-def check_weather(configuration):
-    if configuration['weather']['provider'] == "openweathermap":
-        url = "http://api.openweathermap.org/data/2.5/forecast/daily?APPID=" \
-                      + configuration['weather']['app_id'] \
-                      + "&id=" + str(configuration['weather']['city_id']) \
-                      + "&cnt=" + str(configuration['weather']['days']) \
-                      + "&units=" + configuration['weather']['units'] \
-                      + "&lang=" + configuration['weather']['language']
-    else:
-        print "Please specify weather provider in config.yaml"
-        return "Fail", ""
+@click.command()
+@click.option('--text', is_flag=True, help='It will send a text if required')
+@click.argument('config_file_name')
+def check_weather(config_file_name, text):
+    with open(config_file_name) as configuration_file:
+        try:
+            config = yaml.safe_load(configuration_file)
 
-    req = requests.get(url)
+            if config['weather']['provider'] == "openweathermap":
+                url = "http://api.openweathermap.org/data/2.5/forecast/daily?APPID=" \
+                      + config['weather']['app_id'] \
+                              + "&id=" + str(config['weather']['city_id']) \
+                              + "&cnt=" + str(config['weather']['days']) \
+                              + "&units=" + config['weather']['units'] \
+                              + "&lang=" + config['weather']['language']
+            else:
+                print "Unsupported weather provider!"
+                return
 
-    if req.status_code != 200:
-        return "Fail", ""
+            req = requests.get(url)
+            if req.status_code != 200:
+                message = config['message']['failure_text']
+                print "{} -> {}".format(message, ctime(time())).encode('UTF-8')
+                if text:
+                    send_text(config, message.encode('UTF-8'), "")
+                return
 
-    content = json.loads(req.text)
-    forecast = content['list'][0]
-    condition = forecast['weather'][0]
-    if condition['main'] == "Rain":
-        return condition['main'], condition['description']
+            content = json.loads(req.text)
+            forecast = content['list'][0]
+            condition = forecast['weather'][0]
+            if condition['main'] == "Rain":
+                message = config['message']['rain_text']
+                details = condition['description']
+                print "{} -> {}".format(message, ctime(time())).encode('UTF-8')
+                if text:
+                    send_text(config, message.encode('UTF-8'),
+                              details.encode('UTF-8'))
+                return
 
-    return "No Rain", ""
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print "Script usage: "
-        print "python alert_me.py <config_file>"
-        sys.exit()
-
-    # Get the config information
-    config_file = open(sys.argv[1])
-    config = yaml.safe_load(config_file)
-    config_file.close()
-
-    result, detail = check_weather(config)
-    if result == "Rain":
-        send_email(config, config['message']['text'], detail)
-        print "It's going to rain, sent you a text " + str(ctime(time()))
-    elif result == "Fail":
-        send_email(config, "FAILURE!", "Weather API failed")
-        print "Weather API failure " + str(ctime(time()))
-    else:
-        print "It's not going to rain " + str(ctime(time()))
+            message = config['message']['no_rain_text']
+            print "{} -> {}".format(message, ctime(time())).encode('UTF-8')
+        except yaml.YAMLError:
+            print "Incorrect config file. Please check sample file"
