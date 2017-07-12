@@ -18,3 +18,4 @@ grab_yo_umbrella <config_file_location> --text
 3. I setup a cron job to text me every morning at 7 AM. My cron entry looks like this,  
 ```0 7 * * * grab_yo_umbrella /path/to/config.yaml --text >> /path/to/log/file 2>&1```  
 The bit at the end is to log the results of the day
+4. To modify the script and get other weather details, checkout [openweathermap](http://openweathermap.org/current)
