@@ -58,7 +58,11 @@ def check_weather(config_file_name, text):
       content = json.loads(req.text)
       forecast = content['list'][0]
       condition = forecast['weather'][0]
-      if condition['main'] == "Rain":
+      print condition
+      if condition['main'] == "Rain" \
+      or condition['main'] == "Thunderstorm" \
+      or condition['main'] == "Drizzle" \
+      or condition['main'] == "Extreme":
         message = config['message']['rain_text']
         details = condition['description']
         print "{} -> {}".format(message, ctime(time())).encode('UTF-8')
